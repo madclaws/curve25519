@@ -24,7 +24,7 @@ fn main() {
 
     let data = "Hello bob";
     let (encrypted_data, tag) = encrypt(&data.as_bytes().to_vec(), alice_shared_key).unwrap();
-    println!("ALICE encrypted `hello bob` into - {:?}", encrypted_data);
+    println!("ALICE encrypted `{}` into - {:?}", data, encrypted_data);
     let decrypted_data = decrypt(&encrypted_data, bob_shared_key, tag);
     println!("BOB decrypted to - {:?}", String::from_utf8(decrypted_data).unwrap())
 }

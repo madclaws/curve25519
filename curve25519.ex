@@ -1,4 +1,7 @@
 defmodule Curve25519 do
+  @moduledoc """
+  A simple curve25519 implementation
+  """
   import Bitwise
 
   @prime 0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED
