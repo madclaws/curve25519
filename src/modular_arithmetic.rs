@@ -52,6 +52,34 @@ pub fn mul_inv(x: BigUint) -> BigUint {
 }
 
 /*
+   This is exponentation by multiplication
+
+   say we have to calculate x^exp,
+   - let result = 1,
+   - we go from LSB of the exp to MSB
+       - the way we do this is by right shifting exp on every iteration and reassigning new value of exp as it.
+   - we do bitwise and, to find out if the current LSB is 1 or not.
+   - If 1, then we multiply x with `result`
+   - Then we do x = x * x
+   - This repeats until the right shitt is over.
+*/
+pub fn calculate_exponent(x: BigUint, exp: BigUint) -> BigUint {
+    let mut result: BigUint = BigUint::from_str_radix("1", 16).expect("err");
+    let mut var_x = x;
+    let mut exp_x = exp;
+    let bitandnum: BigUint = BigUint::from(1_u16);
+    loop {
+        if exp_x == BigUint::from(0_u16) {
+            // println!("{}", result);
+            return result;
+        } else if exp_x.clone().bitand(&bitandnum) == bitandnum {
+            result *= &var_x;
+        }
+        var_x = mul(&var_x, &var_x);
+        exp_x = exp_x.clone().shr(1);
+    }
+}
+/*
    Scalar multiplication of a point's x in a elliptic curve
 
 */
@@ -153,34 +181,7 @@ fn cswap(swap: &BigUint, x2: BigUint, x3: BigUint) -> (BigUint, BigUint) {
     let x3a = x3.bitxor(dummy);
     (x2a, x3a)
 }
-/*
-   This is exponentation by multiplication
 
-   say we have to calculate x^exp,
-   - let result = 1,
-   - we go from LSB of the exp to MSB
-       - the way we do this is by right shifting exp on every iteration and reassigning new value of exp as it.
-   - we do bitwise and, to find out if the current LSB is 1 or not.
-   - If 1, then we multiply x with `result`
-   - Then we do x = x * x
-   - This repeats until the right shitt is over.
-*/
-fn calculate_exponent(x: BigUint, exp: BigUint) -> BigUint {
-    let mut result: BigUint = BigUint::from_str_radix("1", 16).expect("err");
-    let mut var_x = x;
-    let mut exp_x = exp;
-    let bitandnum: BigUint = BigUint::from(1_u16);
-    loop {
-        if exp_x == BigUint::from(0_u16) {
-            // println!("{}", result);
-            return result;
-        } else if exp_x.clone().bitand(&bitandnum) == bitandnum {
-            result *= &var_x;
-        }
-        var_x = mul(&var_x, &var_x);
-        exp_x = exp_x.clone().shr(1);
-    }
-}
 
 pub fn decode_little_endian(num: &BigUint) -> BigUint {
     let little_bytes = num.to_bytes_le();
