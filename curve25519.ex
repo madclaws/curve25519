@@ -62,6 +62,16 @@ defmodule Curve25519 do
     calculate_exponent(x, @prime - 2)
   end
 
+  #This is exponentation by squaring
+
+  # say we have to calculate x^exp,
+  # - let result = 1,
+  # - we go from LSB of the exp to MSB
+  #    - the way we do this is by right shifting exp on every iteration and reassigning new value of exp as it.
+  # - we do bitwise AND, to find out if the current LSB is 1 or not.
+  # - If 1, then we multiply x with `result`
+  # - Then we do x = x * x
+  # - This repeats until exp is 0 .
   @spec calculate_exponent(non_neg_integer(), non_neg_integer(), non_neg_integer()) :: non_neg_integer()
   defp calculate_exponent(x, exp, result \\ 1)
   defp calculate_exponent(_x, 0, result), do: result

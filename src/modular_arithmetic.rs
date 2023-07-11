@@ -52,7 +52,7 @@ pub fn mul_inv(x: BigUint) -> BigUint {
 }
 
 /*
-   This is exponentation by multiplication
+   This is exponentation by squaring
 
    say we have to calculate x^exp,
    - let result = 1,
@@ -61,16 +61,15 @@ pub fn mul_inv(x: BigUint) -> BigUint {
    - we do bitwise and, to find out if the current LSB is 1 or not.
    - If 1, then we multiply x with `result`
    - Then we do x = x * x
-   - This repeats until the right shitt is over.
+   - This repeats until exp is 0.
 */
 pub fn calculate_exponent(x: BigUint, exp: BigUint) -> BigUint {
-    let mut result: BigUint = BigUint::from_str_radix("1", 16).expect("err");
+    let mut result: BigUint = BigUint::from_u8(1).unwrap();
     let mut var_x = x;
     let mut exp_x = exp;
     let bitandnum: BigUint = BigUint::from(1_u16);
     loop {
         if exp_x == BigUint::from(0_u16) {
-            // println!("{}", result);
             return result;
         } else if exp_x.clone().bitand(&bitandnum) == bitandnum {
             result *= &var_x;
