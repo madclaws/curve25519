@@ -20,11 +20,11 @@ fn main() {
     let bob_shared_key = generate_diffie_hellman_key(bob_priv_key, alice_pub_key);
 
     println!("ALICE SHARED KEY - {}", alice_shared_key);
-    println!("BOB SHARED KEY - {}", bob_shared_key);
+    println!("BOB SHARED KEY - {}\n", bob_shared_key);
 
     let data = "Hello bob";
-    let (encrypted_data, tag) = encrypt(&data.as_bytes().to_vec(), alice_shared_key).unwrap();
-    println!("ALICE encrypted `{}` into - {:?}", data, encrypted_data);
+    let (encrypted_data, tag) = encrypt(data.as_bytes(), alice_shared_key).unwrap();
+    println!("ALICE encrypted `{}` into - {:?}\n", data, encrypted_data);
     let decrypted_data = decrypt(&encrypted_data, bob_shared_key, tag);
-    println!("BOB decrypted to - {:?}", String::from_utf8(decrypted_data).unwrap())
+    println!("BOB decrypted {:?} into {:?}", encrypted_data, String::from_utf8(decrypted_data).unwrap())
 }

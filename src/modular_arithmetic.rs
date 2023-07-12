@@ -79,8 +79,7 @@ pub fn calculate_exponent(x: BigUint, exp: BigUint) -> BigUint {
     }
 }
 /*
-   Scalar multiplication of a point's x in a elliptic curve
-
+   Scalar multiplication of a point's x in a elliptic curve - Montogomery ladder
 */
 pub fn mul_k_u(k: BigUint, u: BigUint) -> BigUint {
     let k1 = decode_little_endian(&k);
@@ -115,7 +114,7 @@ pub fn mul_k_u(k: BigUint, u: BigUint) -> BigUint {
     )
 }
 
-// algorithm for montgomery ladder to caluclate scalar multiplication in elliptic curve
+// algorithm for montgomery ladder to calculate scalar multiplication in elliptic curve
 fn mul_k_u_ladder(
     mut t: i32,
     k: BigUint,
@@ -127,7 +126,6 @@ fn mul_k_u_ladder(
     mut swap: BigUint,
 ) -> BigUint {
     loop {
-        // println!("t => {}", t);
         if t == -1 {
             let (x2a, _x3a) = cswap(&swap, x_2, x_3);
             let (z2a, _z3a) = cswap(&swap, z_2, z_3);
@@ -185,9 +183,6 @@ fn cswap(swap: &BigUint, x2: BigUint, x3: BigUint) -> (BigUint, BigUint) {
 pub fn decode_little_endian(num: &BigUint) -> BigUint {
     let little_bytes = num.to_bytes_le();
     BigUint::from_bytes_be(&little_bytes)
-
-    // println!("le_bytes - {:?}", BigUint::from_bytes_be(&little_bytes));
-    // Zero::zero()
 }
 
 pub fn test_k_u_iter(mut k: BigUint, mut u: BigUint, mut iter: u32) -> String {
@@ -341,14 +336,14 @@ mod tests {
         )
     }
 
-    // #[test]
-    // fn test_mul_k_u_iter() {
-    //     let k = BigUint::from_str_radix("0900000000000000000000000000000000000000000000000000000000000000", 16).expect("err");
-    //     let u = BigUint::from_str_radix("0900000000000000000000000000000000000000000000000000000000000000", 16).expect("err");
-    //     let res = test_k_u_iter(k, u, 1);
-    //     assert_eq!(
-    //         res,
-    //         Zero::zero()
-    //     )
-    // }
+    #[test]
+    fn test_mul_k_u_iter() {
+        let k = BigUint::from_str_radix("0900000000000000000000000000000000000000000000000000000000000000", 16).expect("err");
+        let u = BigUint::from_str_radix("0900000000000000000000000000000000000000000000000000000000000000", 16).expect("err");
+        let res = test_k_u_iter(k, u, 300);
+        assert_eq!(
+            res,
+            String::from("ab01f96be0469f1978174ca1519d0328c40930be793551548917dd2e624ce612")
+        )
+    }
 }

@@ -1,7 +1,5 @@
-use std::{ops::Shl, error::Error};
-
 use num_bigint::BigUint;
-use num_traits::{FromPrimitive, ToPrimitive};
+use num_traits::{FromPrimitive};
 use rand::Rng;
 use ring::aead::{UnboundKey, AES_128_GCM, Nonce, SealingKey, BoundKey, NonceSequence, Aad, NONCE_LEN, OpeningKey, Tag};
 use crate::modular_arithmetic;
@@ -70,7 +68,7 @@ pub fn decrypt(encrypted_data: &[u8], shared_key: BigUint, tag: Tag) -> Vec<u8>{
 
     let mut opening_key = OpeningKey::new(dec_unbound_key, dec_nonce_sequence);
     
-    let mut cypher_text_with_tag = [&encrypted_data, tag.as_ref()].concat();
+    let mut cypher_text_with_tag = [encrypted_data, tag.as_ref()].concat();
 
 
     opening_key.open_in_place(dec_aad, &mut cypher_text_with_tag).unwrap().to_vec()

@@ -11,33 +11,39 @@ defmodule Curve25519 do
   @all256 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
   @a24 121665
 
-  def test_k_u_iter(k, _u, 0), do: IO.inspect(k)
+  def test_k_u_iter(iter \\ 1, k \\ 0x0900000000000000000000000000000000000000000000000000000000000000,
+    u \\ 0x0900000000000000000000000000000000000000000000000000000000000000)
+  def test_k_u_iter(0, k , _u), do: Integer.to_string(k, 16)
 
-  def test_k_u_iter(k, u, iter) do
+  def test_k_u_iter(iter, k, u) do
     k1 = mul_k_u(k, u)
     u1 = k
-    test_k_u_iter(k1, u1, iter - 1)
+    test_k_u_iter(iter - 1, k1, u1)
   end
 
-  def test_echd() do
+  def test_ecdh() do
     g = 9
     alice_pri_key = :rand.uniform(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) |> IO.inspect(label: :alice_pkey)
-    bob_pri_key = :rand.uniform(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) |> IO.inspect(label: :bob_pkey)
-
     alice_pub_key = mul_k_u(alice_pri_key, g) |> IO.inspect(label: :alice_pub_key)
+    IO.puts("\n")
+    bob_pri_key = :rand.uniform(0x7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF) |> IO.inspect(label: :bob_pkey)
     bob_pub_key = mul_k_u(bob_pri_key, g) |> IO.inspect(label: :bob_pub_key)
+
+    IO.puts("\n")
 
     alice_shared_Key = mul_k_u(alice_pri_key, bob_pub_key) |> IO.inspect(label: :alice_shared_Key)
     bob_shared_Key = mul_k_u(bob_pri_key, alice_pub_key) |> IO.inspect(label: :bob_shared_Key)
-
-    IO.inspect(alice_shared_Key)
+    IO.puts("\n")
 
     iv = :crypto.strong_rand_bytes(16)
 
+    # encrypting
     enc_text = :crypto.crypto_one_time(:aes_128_ctr, <<:binary.decode_unsigned(<<alice_shared_Key::size(128)>>, :little)::size(128)>>, iv, <<"hello bob">>, true)
+    IO.puts("Alice encrypted hello bob into #{inspect enc_text}")
 
     # decrypting
-    :crypto.crypto_one_time(:aes_128_ctr, <<:binary.decode_unsigned(<<bob_shared_Key::size(128)>>, :little)::size(128)>>, iv, enc_text, false)
+    dec_text = :crypto.crypto_one_time(:aes_128_ctr, <<:binary.decode_unsigned(<<bob_shared_Key::size(128)>>, :little)::size(128)>>, iv, enc_text, false)
+    IO.puts("Alice decrypted #{inspect enc_text} into #{inspect dec_text}")
 
   end
 
@@ -90,6 +96,8 @@ defmodule Curve25519 do
 
   ##### Elliptic curve operations ##########################
   # f(k, u) -> u, another point's u
+  # Scalar multiplication of a point's x in a elliptic curve - Montogomery ladder
+
   @spec mul_k_u(non_neg_integer(), non_neg_integer()) :: non_neg_integer()
   defp mul_k_u(k, u) do
     k1 = :binary.decode_unsigned(<<k::size(256)>>, :little)
