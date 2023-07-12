@@ -27,7 +27,7 @@ c("curve25519.ex")
 
 # run the demo function
 
-Curve25519.test_echd
+Curve25519.test_ecdh
 
 ```
 
